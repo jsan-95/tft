@@ -10,52 +10,52 @@ IMG_SIZE = 50
 training_data = []
 validation_data = []
 
+
+def createTrainingData():
+    i = 0
+    for fn in os.listdir(DATADIR):
+        if os.path.isdir(DATADIR + fn):
+            CATEGORIES.append(fn)
+            i += 1
+        if i == 2:
+            break
+    for category in CATEGORIES:
+        class_num = CATEGORIES.index(category)
+        path = os.path.join(DATADIR, category)
+
+        # for class_path in os.listdir(path):
+        #     if class_path.endswith('.jpeg'):
+        #         img = os.path.join(path, class_path)
+        #         img_array = cv2.imread(img, cv2.IMREAD_GRAYSCALE)
+        #         normalizedImg = np.zeros((IMG_SIZE, IMG_SIZE))
+        #         normalizedImg = cv2.normalize(img_array, normalizedImg, 0, 255, cv2.NORM_MINMAX)
+        #         new_array = cv2.resize(normalizedImg, (IMG_SIZE, IMG_SIZE))
+        #         training_data.append([new_array, class_num])
+
+        for class_path in os.listdir(path):
+            path_instead = os.path.join(path, class_path)
+            for img in os.listdir(path_instead):
+                img_array = cv2.imread(os.path.join(path_instead, img), cv2.IMREAD_GRAYSCALE)
+                new_array = cv2.resize(img_array, (IMG_SIZE, IMG_SIZE))
+                training_data.append([new_array, class_num])
+
+
+def createValidationData():
+    for category in CATEGORIES:
+        CATEGORIES_VALIDATION.append(category)
+
+    for category in CATEGORIES_VALIDATION:
+        class_num = CATEGORIES_VALIDATION.index(category)
+        path_image = os.path.join(VALIDATIONDIR, category + '.jpg')
+        print(path_image)
+        img_array = cv2.imread(path_image, cv2.IMREAD_GRAYSCALE)
+        normalizedImg = np.zeros((IMG_SIZE, IMG_SIZE))
+        normalizedImg = cv2.normalize(img_array, normalizedImg, 0, 255, cv2.NORM_MINMAX)
+        new_array = cv2.resize(normalizedImg, (IMG_SIZE, IMG_SIZE))
+        validation_data.append([new_array, class_num])
+
+
 if __name__ == '__main__':
-    def createTrainingData():
-        i = 0
-        for fn in os.listdir(DATADIR):
-            if os.path.isdir(DATADIR + fn):
-                CATEGORIES.append(fn)
-                i += 1
-            if i == 2:
-                break
-        print(CATEGORIES)
-        for category in CATEGORIES:
-            class_num = CATEGORIES.index(category)
-            path = os.path.join(DATADIR, category)
-
-            # for class_path in os.listdir(path):
-            #     if class_path.endswith('.jpeg'):
-            #         img = os.path.join(path, class_path)
-            #         img_array = cv2.imread(img, cv2.IMREAD_GRAYSCALE)
-            #         normalizedImg = np.zeros((IMG_SIZE, IMG_SIZE))
-            #         normalizedImg = cv2.normalize(img_array, normalizedImg, 0, 255, cv2.NORM_MINMAX)
-            #         new_array = cv2.resize(normalizedImg, (IMG_SIZE, IMG_SIZE))
-            #         training_data.append([new_array, class_num])  # add this to our training_data
-
-            for class_path in os.listdir(path):
-                 path_instead = os.path.join(path, class_path)
-                 print(path_instead)
-                 for img in os.listdir(path_instead):
-
-                     img_array = cv2.imread(os.path.join(path_instead, img), cv2.IMREAD_GRAYSCALE)
-                     new_array = cv2.resize(img_array, (IMG_SIZE, IMG_SIZE))
-                     training_data.append([new_array, class_num])  # add this to our training_data
-
-
-    def createValidationData():
-        for category in CATEGORIES:
-            CATEGORIES_VALIDATION.append(category)
-
-        for category in CATEGORIES_VALIDATION:
-            class_num = CATEGORIES_VALIDATION.index(category)
-            path_image = os.path.join(VALIDATIONDIR, category + '.jpg')
-            print(path_image)
-            img_array = cv2.imread(path_image, cv2.IMREAD_GRAYSCALE)
-            normalizedImg = np.zeros((IMG_SIZE, IMG_SIZE))
-            normalizedImg = cv2.normalize(img_array, normalizedImg, 0, 255, cv2.NORM_MINMAX)
-            new_array = cv2.resize(normalizedImg, (IMG_SIZE, IMG_SIZE))
-            validation_data.append([new_array, class_num])  # add this to our training_data
 
     createTrainingData()
     createValidationData()
@@ -87,8 +87,10 @@ if __name__ == '__main__':
 
     from keras.applications import vgg16
 
+
     def create_vgg16():
-        model = vgg16.VGG16(include_top=True, weights=None, input_tensor=None, input_shape=(IMG_SIZE, IMG_SIZE, 1), pooling='avg',
+        model = vgg16.VGG16(include_top=True, weights=None, input_tensor=None, input_shape=(IMG_SIZE, IMG_SIZE, 1),
+                            pooling='avg',
                             classes=1)
         return model
 
